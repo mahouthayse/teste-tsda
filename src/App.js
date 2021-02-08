@@ -28,10 +28,22 @@ const newStyle = makeStyles((theme) => ({
 
 function App() {
   const [posts, setPosts] = useState([]);
-  const [singlePost, setSinglePost] = useState({});
-  const postId = '';
+  const [singlePost, setSinglePost] = useState({
+    id:'',
+    title:'',
+    body:'',
+    userId:''
+  });
+  let postId = '';
   const [open, setOpen] = useState(false);
   const [commentArray, setCommentArray] = useState([]);
+  const [singleComment, setSingleComment] = useState({
+    postId:'',
+    id:'',
+    name:'',
+    email:'',
+    body:''
+  })
   const styles = newStyle();
 
 
@@ -39,13 +51,8 @@ function App() {
     fetch('https://jsonplaceholder.typicode.com/posts')
         .then(response => response.json())
         .then(data => setPosts(data));
-  })
+  }, []);
 
-   function fetchComments(){
-     fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
-         .then(response => response.json())
-         .then(data => setCommentArray(data));
-  }
 
   function openDialog(context, id) {
     if (context === 'edit') {
@@ -63,7 +70,82 @@ function App() {
     }
   }
 
+  function createPost(){
+    fetch('https://jsonplaceholder.typicode.com/posts', {
+      method: 'POST',
+      body: JSON.stringify({
+        title: singlePost.title,
+        body: singlePost.body,
+        userId: 1,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    })
+        .then((response) => response.json())
+        .then(() => setOpen(!open));
+  }
 
+  function createPostAndContinue(){
+    fetch('https://jsonplaceholder.typicode.com/posts', {
+      method: 'POST',
+      body: JSON.stringify({
+        title: singlePost.title,
+        body: singlePost.body,
+        userId: 1,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    })
+        .then((response) => response.json())
+        .then(() => setSinglePost({
+          title:'',
+          body:''
+        }));
+  }
+
+  function deletePost(id){
+    fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  function insertComments(){
+    let array = commentArray;
+    fetch('https://jsonplaceholder.typicode.com/posts', {
+      method: 'POST',
+      body: JSON.stringify({
+        title: singlePost.title,
+        body: singlePost.body,
+        userId: 1,
+      }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    })
+        .then((response) => response.json())
+        .then(data => {
+          fetch(`https://jsonplaceholder.typicode.com/posts/${data.id}/comments`, {
+            method: 'POST',
+            body: JSON.stringify({
+              postId:postId,
+              name:singleComment.name,
+              email:singleComment.email,
+              body: singleComment.body,
+            }),
+            headers: {
+              'Content-type': 'application/json; charset=UTF-8',
+            },
+          })
+              .then((response) => response.json())
+              .then(response => {
+                array.push(response)
+                setCommentArray(array)
+              });
+        });
+
+  }
 
 
   return (
@@ -100,7 +182,7 @@ function App() {
                             <IconEdit size={24} color="#01FF01" stroke={1} strokeLinejoin="miter" />
                           </IconButton>
 
-                          <IconButton aria-label="delete">
+                          <IconButton aria-label="delete" onClick={() => deletePost(post.id)}>
                             <IconTrash size={24} color="#01FF01" stroke={1} strokeLinejoin="miter" />
                           </IconButton>
                       </TableCell>
@@ -116,17 +198,17 @@ function App() {
               <form noValidate autoComplete="off">
                 <h2>Postagem</h2>
                 <Divider className={styles.divider}/>
-                <TextField id="outlined-basic" label="Título" value={singlePost.title} variant="outlined" className={styles.textField}/>
-                <TextField id="outlined-basic" label="Conteúdo" value={singlePost.body} variant="outlined" multiline rows={6} className={styles.textField}/>
+                <TextField id="outlined-basic" label="Título" value={singlePost.title} variant="outlined" className={styles.textField} onChange={e => setSinglePost({ ...singlePost, title: e.target.value })}/>
+                <TextField id="outlined-basic" label="Conteúdo" value={singlePost.body} variant="outlined" multiline rows={6} className={styles.textField} onChange={e => setSinglePost({ ...singlePost, body: e.target.value })}/>
 
                 <h2>Comentários</h2>
                 <Divider className={styles.divider}/>
-                <TextField id="outlined-basic" label="Nome" variant="outlined" className={styles.textField}/>
-                <TextField id="outlined-basic" label="E-mail" variant="outlined" className={styles.textField}/>
-                <TextField id="outlined-basic" label="Comentário" variant="outlined" className={styles.textField}/>
+                <TextField id="outlined-basic" label="Nome" variant="outlined" className={styles.textField} value={singleComment.name} onChange={e => setSingleComment({ ...singleComment, name: e.target.value })}/>
+                <TextField id="outlined-basic" label="E-mail" variant="outlined" className={styles.textField} value={singleComment.email} onChange={e => setSingleComment({ ...singleComment, email: e.target.value })}/>
+                <TextField id="outlined-basic" label="Comentário" variant="outlined" className={styles.textField} value={singleComment.body} onChange={e => setSingleComment({ ...singleComment, body: e.target.value })}/>
               </form>
 
-              <Button variant="contained" onClick={() => setOpen(!open)} color="primary">
+              <Button variant="contained" onClick={() => insertComments()} color="primary">
                 Adicionar Comentário
               </Button>
 
@@ -156,11 +238,11 @@ function App() {
               <Button variant="contained" onClick={() => setOpen(!open)} color="primary">
                 Fechar
               </Button>
-              <Button variant="contained" onClick={() => setOpen(!open)} color="primary">
+              <Button variant="contained" onClick={() => createPostAndContinue()} color="primary">
                 Salvar e Continuar
               </Button>
 
-              <Button variant="contained" onClick={() => setOpen(!open)} color="primary" autoFocus>
+              <Button variant="contained" onClick={() => createPost()} color="primary" autoFocus>
                 Salvar
               </Button>
             </DialogActions>
