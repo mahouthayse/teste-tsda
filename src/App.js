@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { Grid, Divider, TableCell, Table, TableContainer, TableBody, TableHead, TableRow, Paper, IconButton, Button,
+import { Grid, Divider, TableCell, Table, TableContainer, TableBody, TableHead, TableRow, Paper, IconButton,
   Dialog, DialogTitle, DialogActions, DialogContent, TextField} from "@material-ui/core";
 import './App.scss';
 import { IconTrash, IconEdit } from 'tabler-icons';
@@ -250,7 +250,6 @@ function App() {
                 });
           });
     }
-
   }
 
 
@@ -266,7 +265,7 @@ function App() {
           </Grid>
 
           <TableContainer component={Paper}>
-            <Table size="small" aria-label="a dense table">
+            <Table size="small" aria-label="posts">
               <TableHead>
                 <TableRow>
                   <TableCell align="left">Id</TableCell>
@@ -302,14 +301,14 @@ function App() {
               <form noValidate autoComplete="off">
                 <SectionSubtitle>Postagem</SectionSubtitle>
                 <Divider className={styles.divider}/>
-                <TextField id="outlined-basic" label="Título" value={singlePost.title} variant="outlined" className={styles.textField} onChange={e => setSinglePost({ ...singlePost, title: e.target.value })}/>
-                <TextField id="outlined-basic" label="Conteúdo" value={singlePost.body} variant="outlined" multiline rows={6} className={styles.textField} onChange={e => setSinglePost({ ...singlePost, body: e.target.value })}/>
+                <TextField label="Título" value={singlePost.title} variant="outlined" className={styles.textField} onChange={e => setSinglePost({ ...singlePost, title: e.target.value })}/>
+                <TextField label="Conteúdo" value={singlePost.body} variant="outlined" multiline rows={6} className={styles.textField} onChange={e => setSinglePost({ ...singlePost, body: e.target.value })}/>
 
                 <SectionSubtitle>Comentários</SectionSubtitle>
                 <Divider className={styles.divider}/>
-                <TextField id="outlined-basic" label="Nome" variant="outlined" className={styles.textField} value={singleComment.name} onChange={e => setSingleComment({ ...singleComment, name: e.target.value })}/>
-                <TextField id="outlined-basic" label="E-mail" variant="outlined" className={styles.textField} value={singleComment.email} onChange={e => setSingleComment({ ...singleComment, email: e.target.value })}/>
-                <TextField id="outlined-basic" label="Comentário" variant="outlined" className={styles.textField} value={singleComment.body} onChange={e => setSingleComment({ ...singleComment, body: e.target.value })}/>
+                <TextField  label="Nome" variant="outlined" className={styles.textField} value={singleComment.name} onChange={e => setSingleComment({ ...singleComment, name: e.target.value })}/>
+                <TextField label="E-mail" variant="outlined" className={styles.textField} value={singleComment.email} onChange={e => setSingleComment({ ...singleComment, email: e.target.value })}/>
+                <TextField label="Comentário" variant="outlined" className={styles.textField} value={singleComment.body} onChange={e => setSingleComment({ ...singleComment, body: e.target.value })}/>
               </form>
 
               <ButtonPrimary variant="contained" disableElevation onClick={() => insertComments(singlePost.id)}>
