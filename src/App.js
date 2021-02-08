@@ -4,6 +4,7 @@ import { Grid, Divider, TableCell, Table, TableContainer, TableBody, TableHead, 
 import './App.scss';
 import { IconTrash, IconEdit } from 'tabler-icons';
 import { makeStyles } from '@material-ui/core/styles';
+import {ButtonPrimary, SectionSubtitle, SectionTitle} from "./components/styled";
 
 
 
@@ -71,6 +72,7 @@ function App() {
   }
 
   function createPost(){
+    let array = posts;
     fetch('https://jsonplaceholder.typicode.com/posts', {
       method: 'POST',
       body: JSON.stringify({
@@ -83,10 +85,15 @@ function App() {
       },
     })
         .then((response) => response.json())
-        .then(() => setOpen(!open));
+        .then(data => {
+          array.push(data);
+          setPosts(array);
+          setOpen(!open)
+        });
   }
 
   function createPostAndContinue(){
+    let array = posts;
     fetch('https://jsonplaceholder.typicode.com/posts', {
       method: 'POST',
       body: JSON.stringify({
@@ -99,15 +106,30 @@ function App() {
       },
     })
         .then((response) => response.json())
-        .then(() => setSinglePost({
-          title:'',
-          body:''
-        }));
+        .then(data => {
+          array.push(data);
+          setPosts(array);
+          setSinglePost({
+                title:'',
+                body:''
+              });
+          setSingleComment({
+            name:'',
+            email:'',
+            body:''
+          });
+        });
   }
 
-  function deletePost(id){
+  function deletePost(id, indice){
+    let array = posts;
     fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
       method: 'DELETE',
+    }).then(() => {
+      let removed = array.filter( (item, index) => {
+        return index != indice;
+      });
+      setPosts(removed);
     });
   }
 
@@ -158,16 +180,14 @@ function App() {
         <Grid container xs={12} md={10}>
 
           <Grid container xs={12} alignItems='center' justify='space-between' direction='row'>
-
-            <h1>Postagens</h1>
-
-            <Button variant="contained" color="primary" onClick={() => openDialog('add', '')}>
+            <SectionTitle>Postagens</SectionTitle>
+            <ButtonPrimary variant="contained" disableElevation onClick={() => openDialog('add', '')}>
               Adicionar Postagem
-            </Button>
+            </ButtonPrimary>
           </Grid>
 
           <TableContainer component={Paper}>
-            <Table  size="small" aria-label="a dense table">
+            <Table size="small" aria-label="a dense table">
               <TableHead>
                 <TableRow>
                   <TableCell align="left">Id</TableCell>
@@ -177,18 +197,18 @@ function App() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {posts.map((post) => (
+                {posts.map((post, index) => (
                     <TableRow key={post.id}>
                       <TableCell component="th" scope="row" align="left">{post.id}</TableCell>
                       <TableCell align="left">{post.title}</TableCell>
                       <TableCell align="left">{post.body}</TableCell>
                       <TableCell align="left">
                           <IconButton aria-label="edit" onClick={() => openDialog('edit', post.id)}>
-                            <IconEdit size={24} color="#01FF01" stroke={1} strokeLinejoin="miter" />
+                            <IconEdit size={24} color="#3E59B6" stroke={2} strokeLinejoin="miter" />
                           </IconButton>
 
-                          <IconButton aria-label="delete" onClick={() => deletePost(post.id)}>
-                            <IconTrash size={24} color="#01FF01" stroke={1} strokeLinejoin="miter" />
+                          <IconButton aria-label="delete" onClick={() => deletePost(post.id, index)}>
+                            <IconTrash size={24} color="#3E59B6" stroke={2} strokeLinejoin="miter" />
                           </IconButton>
                       </TableCell>
                     </TableRow>
@@ -201,21 +221,21 @@ function App() {
             <DialogTitle>{'Adicionar novo item'}</DialogTitle>
             <DialogContent>
               <form noValidate autoComplete="off">
-                <h2>Postagem</h2>
+                <SectionSubtitle>Postagem</SectionSubtitle>
                 <Divider className={styles.divider}/>
                 <TextField id="outlined-basic" label="Título" value={singlePost.title} variant="outlined" className={styles.textField} onChange={e => setSinglePost({ ...singlePost, title: e.target.value })}/>
                 <TextField id="outlined-basic" label="Conteúdo" value={singlePost.body} variant="outlined" multiline rows={6} className={styles.textField} onChange={e => setSinglePost({ ...singlePost, body: e.target.value })}/>
 
-                <h2>Comentários</h2>
+                <SectionSubtitle>Comentários</SectionSubtitle>
                 <Divider className={styles.divider}/>
                 <TextField id="outlined-basic" label="Nome" variant="outlined" className={styles.textField} value={singleComment.name} onChange={e => setSingleComment({ ...singleComment, name: e.target.value })}/>
                 <TextField id="outlined-basic" label="E-mail" variant="outlined" className={styles.textField} value={singleComment.email} onChange={e => setSingleComment({ ...singleComment, email: e.target.value })}/>
                 <TextField id="outlined-basic" label="Comentário" variant="outlined" className={styles.textField} value={singleComment.body} onChange={e => setSingleComment({ ...singleComment, body: e.target.value })}/>
               </form>
 
-              <Button variant="contained" onClick={() => insertComments()} color="primary">
+              <ButtonPrimary variant="contained" disableElevation onClick={() => insertComments()}>
                 Adicionar Comentário
-              </Button>
+              </ButtonPrimary>
 
               <TableContainer component={Paper}>
                 <Table  size="small" aria-label="a dense table">
@@ -240,16 +260,16 @@ function App() {
 
             </DialogContent>
             <DialogActions>
-              <Button variant="contained" onClick={() => setOpen(!open)} color="primary">
+              <ButtonPrimary variant="contained" disableElevation onClick={() => setOpen(!open)}>
                 Fechar
-              </Button>
-              <Button variant="contained" onClick={() => createPostAndContinue()} color="primary">
+              </ButtonPrimary>
+              <ButtonPrimary variant="contained" disableElevation onClick={() => createPostAndContinue()}>
                 Salvar e Continuar
-              </Button>
+              </ButtonPrimary>
 
-              <Button variant="contained" onClick={() => createPost()} color="primary" autoFocus>
+              <ButtonPrimary variant="contained" disableElevation onClick={() => createPost()} autoFocus>
                 Salvar
-              </Button>
+              </ButtonPrimary>
             </DialogActions>
           </Dialog>
 
