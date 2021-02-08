@@ -71,54 +71,105 @@ function App() {
     }
   }
 
-  function createPost(){
+  function createPost(id){
     let array = posts;
-    fetch('https://jsonplaceholder.typicode.com/posts', {
-      method: 'POST',
-      body: JSON.stringify({
-        title: singlePost.title,
-        body: singlePost.body,
-        userId: 1,
-      }),
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    })
-        .then((response) => response.json())
-        .then(data => {
-          array.push(data);
-          setPosts(array);
-          setOpen(!open)
-        });
+    if(id){
+      fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          id: id,
+          title: singlePost.title,
+          body: singlePost.body,
+          userId: 1,
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      })
+          .then((response) => response.json())
+          .then(data => {
+            array.push(data);
+            setPosts(array);
+            setOpen(!open)
+          });
+
+    } else{
+      fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: singlePost.title,
+          body: singlePost.body,
+          userId: 1,
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      })
+          .then((response) => response.json())
+          .then(data => {
+            array.push(data);
+            setPosts(array);
+            setOpen(!open)
+          });
+    }
   }
 
-  function createPostAndContinue(){
+  function createPostAndContinue(id){
     let array = posts;
-    fetch('https://jsonplaceholder.typicode.com/posts', {
-      method: 'POST',
-      body: JSON.stringify({
-        title: singlePost.title,
-        body: singlePost.body,
-        userId: 1,
-      }),
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    })
-        .then((response) => response.json())
-        .then(data => {
-          array.push(data);
-          setPosts(array);
-          setSinglePost({
-                title:'',
-                body:''
-              });
-          setSingleComment({
-            name:'',
-            email:'',
-            body:''
+    if(id){
+      fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          id: id,
+          title: singlePost.title,
+          body: singlePost.body,
+          userId: 1,
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      })
+          .then((response) => response.json())
+          .then(data => {
+            array.push(data);
+            setPosts(array);
+            setSinglePost({
+              title:'',
+              body:''
+            });
+            setSingleComment({
+              name:'',
+              email:'',
+              body:''
+            });
+          })
+    }else{
+      fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: singlePost.title,
+          body: singlePost.body,
+          userId: 1,
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      })
+          .then((response) => response.json())
+          .then(data => {
+            array.push(data);
+            setPosts(array);
+            setSinglePost({
+              title:'',
+              body:''
+            });
+            setSingleComment({
+              name:'',
+              email:'',
+              body:''
+            });
           });
-        });
+    }
   }
 
   function deletePost(id, indice){
@@ -133,44 +184,72 @@ function App() {
     });
   }
 
-  function insertComments(){
+  function insertComments(id){
     let array = commentArray;
-    fetch('https://jsonplaceholder.typicode.com/posts', {
-      method: 'POST',
-      body: JSON.stringify({
-        title: singlePost.title,
-        body: singlePost.body,
-        userId: 1,
-      }),
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    })
-        .then((response) => response.json())
-        .then(data => {
-          fetch(`https://jsonplaceholder.typicode.com/posts/${data.id}/comments`, {
-            method: 'POST',
-            body: JSON.stringify({
-              postId:postId,
-              name:singleComment.name,
-              email:singleComment.email,
-              body: singleComment.body,
-            }),
-            headers: {
-              'Content-type': 'application/json; charset=UTF-8',
-            },
-          })
-              .then((response) => response.json())
-              .then(data => {
-                setSingleComment({
-                  name:'',
-                  email:'',
-                  body:''
-                })
-                array.push(data)
-                setCommentArray(array)
-              });
-        });
+    let postsArray = posts;
+    if(id){
+      fetch(`https://jsonplaceholder.typicode.com/posts/${id}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({
+          postId:id,
+          name:singleComment.name,
+          email:singleComment.email,
+          body: singleComment.body,
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      })
+          .then((response) => response.json())
+          .then(data => {
+            array.push(data)
+            setCommentArray(array)
+            setSingleComment({
+              name:'',
+              email:'',
+              body:''
+            })
+          });
+    } else{
+      fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: singlePost.title,
+          body: singlePost.body,
+          userId: 1,
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      })
+          .then((response) => response.json())
+          .then(data => {
+            postsArray.push(data);
+            setPosts(postsArray);
+            fetch(`https://jsonplaceholder.typicode.com/posts/${data.id}/comments`, {
+              method: 'POST',
+              body: JSON.stringify({
+                postId:postId,
+                name:singleComment.name,
+                email:singleComment.email,
+                body: singleComment.body,
+              }),
+              headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+              },
+            })
+                .then((response) => response.json())
+                .then(data => {
+                  array.push(data)
+                  setCommentArray(array)
+                  setSingleComment({
+                    name:'',
+                    email:'',
+                    body:''
+                  })
+                });
+          });
+    }
 
   }
 
@@ -218,7 +297,7 @@ function App() {
           </TableContainer>
 
           <Dialog open={open} onClose={() => setOpen(!open)}>
-            <DialogTitle>{'Adicionar novo item'}</DialogTitle>
+            <DialogTitle>{(!singlePost.id) ?'Adicionar novo item' : 'Editar Item'}</DialogTitle>
             <DialogContent>
               <form noValidate autoComplete="off">
                 <SectionSubtitle>Postagem</SectionSubtitle>
@@ -233,12 +312,12 @@ function App() {
                 <TextField id="outlined-basic" label="Comentário" variant="outlined" className={styles.textField} value={singleComment.body} onChange={e => setSingleComment({ ...singleComment, body: e.target.value })}/>
               </form>
 
-              <ButtonPrimary variant="contained" disableElevation onClick={() => insertComments()}>
+              <ButtonPrimary variant="contained" disableElevation onClick={() => insertComments(singlePost.id)}>
                 Adicionar Comentário
               </ButtonPrimary>
 
               <TableContainer component={Paper}>
-                <Table  size="small" aria-label="a dense table">
+                <Table size="small" aria-label="a dense table">
                   <TableHead>
                     <TableRow>
                       <TableCell align="left">Nome</TableCell>
@@ -263,11 +342,11 @@ function App() {
               <ButtonPrimary variant="contained" disableElevation onClick={() => setOpen(!open)}>
                 Fechar
               </ButtonPrimary>
-              <ButtonPrimary variant="contained" disableElevation onClick={() => createPostAndContinue()}>
+              <ButtonPrimary variant="contained" disableElevation onClick={() => createPostAndContinue(singlePost.id)}>
                 Salvar e Continuar
               </ButtonPrimary>
 
-              <ButtonPrimary variant="contained" disableElevation onClick={() => createPost()} autoFocus>
+              <ButtonPrimary variant="contained" disableElevation onClick={() => createPost(singlePost.id)} autoFocus>
                 Salvar
               </ButtonPrimary>
             </DialogActions>
