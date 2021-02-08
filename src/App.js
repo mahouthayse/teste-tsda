@@ -28,9 +28,9 @@ const newStyle = makeStyles((theme) => ({
 
 function App() {
   const [posts, setPosts] = useState([]);
+  const [singlePost, setSinglePost] = useState({});
   const postId = '';
   const [open, setOpen] = useState(false);
-  const [context, setContext] = useState('add');
   const [commentArray, setCommentArray] = useState([]);
   const styles = newStyle();
 
@@ -47,6 +47,25 @@ function App() {
          .then(data => setCommentArray(data));
   }
 
+  function openDialog(context, id) {
+    if (context === 'edit') {
+      fetch(`https://jsonplaceholder.typicode.com/posts/${id}`)
+          .then(response => response.json())
+          .then(data => setSinglePost(data));
+      fetch(`https://jsonplaceholder.typicode.com/posts/${id}/comments`)
+          .then(response => response.json())
+          .then(data => setCommentArray(data));
+      setOpen(!open);
+    } else {
+      setSinglePost({});
+      setCommentArray([]);
+      setOpen(!open);
+    }
+  }
+
+
+
+
   return (
       <Grid container xs={12} alignItems='center' justify='center'>
         <Grid container xs={12} md={10}>
@@ -55,7 +74,7 @@ function App() {
 
             <h1>Postagens</h1>
 
-            <Button variant="contained" color="primary" onClick={() => setOpen(!open)}>
+            <Button variant="contained" color="primary" onClick={() => openDialog('add', '')}>
               Adicionar Postagem
             </Button>
           </Grid>
@@ -77,7 +96,7 @@ function App() {
                       <TableCell align="left">{post.title}</TableCell>
                       <TableCell align="left">{post.body}</TableCell>
                       <TableCell align="left">
-                          <IconButton aria-label="edit">
+                          <IconButton aria-label="edit" onClick={() => openDialog('edit', post.id)}>
                             <IconEdit size={24} color="#01FF01" stroke={1} strokeLinejoin="miter" />
                           </IconButton>
 
@@ -91,14 +110,14 @@ function App() {
             </Table>
           </TableContainer>
 
-          <Dialog open={open} onClose={() => setOpen(!open)} maxWidth='lg'>
-            <DialogTitle>{(context === 'add') ? 'Adicionar novo item' : 'Editar item'}</DialogTitle>
+          <Dialog open={open} onClose={() => setOpen(!open)}>
+            <DialogTitle>{'Adicionar novo item'}</DialogTitle>
             <DialogContent>
               <form noValidate autoComplete="off">
                 <h2>Postagem</h2>
                 <Divider className={styles.divider}/>
-                <TextField id="outlined-basic" label="Título" variant="outlined" className={styles.textField}/>
-                <TextField id="outlined-basic" label="Conteúdo" variant="outlined" multiline rows={6} className={styles.textField}/>
+                <TextField id="outlined-basic" label="Título" value={singlePost.title} variant="outlined" className={styles.textField}/>
+                <TextField id="outlined-basic" label="Conteúdo" value={singlePost.body} variant="outlined" multiline rows={6} className={styles.textField}/>
 
                 <h2>Comentários</h2>
                 <Divider className={styles.divider}/>
