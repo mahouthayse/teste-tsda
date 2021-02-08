@@ -139,8 +139,13 @@ function App() {
             },
           })
               .then((response) => response.json())
-              .then(response => {
-                array.push(response)
+              .then(data => {
+                setSingleComment({
+                  name:'',
+                  email:'',
+                  body:''
+                })
+                array.push(data)
                 setCommentArray(array)
               });
         });
