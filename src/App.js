@@ -1,11 +1,38 @@
 import React, {useEffect, useState} from "react";
-import { Grid, TableCell, Table, TableContainer, TableBody, TableHead, TableRow, Paper, IconButton, Button, Dialog, DialogTitle, DialogActions, DialogContent} from "@material-ui/core";
+import { Grid, Divider, TableCell, Table, TableContainer, TableBody, TableHead, TableRow, Paper, IconButton, Button,
+  Dialog, DialogTitle, DialogActions, DialogContent, TextField} from "@material-ui/core";
 import './App.scss';
 import { IconTrash, IconEdit } from 'tabler-icons';
+import { makeStyles } from '@material-ui/core/styles';
+
+
+
+const newStyle = makeStyles((theme) => ({
+  textField: {
+    width: '100%',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    color: 'white',
+    paddingBottom: 0,
+    fontWeight: 500,
+    marginBottom:8,
+    marginTop:8
+  },
+  divider:{
+    width:'100%',
+    marginBottom:8
+  }
+}));
+
+
 
 function App() {
   const [posts, setPosts] = useState([]);
+  const postId = '';
   const [open, setOpen] = useState(false);
+  const [context, setContext] = useState('add');
+  const [commentArray, setCommentArray] = useState([]);
+  const styles = newStyle();
 
 
   useEffect( () =>{
@@ -13,6 +40,12 @@ function App() {
         .then(response => response.json())
         .then(data => setPosts(data));
   })
+
+   function fetchComments(){
+     fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
+         .then(response => response.json())
+         .then(data => setCommentArray(data));
+  }
 
   return (
       <Grid container xs={12} alignItems='center' justify='center'>
@@ -58,15 +91,47 @@ function App() {
             </Table>
           </TableContainer>
 
-          <Dialog
-              open={open}
-              onClose={() => setOpen(!open)}
-              aria-labelledby="alert-dialog-title"
-              aria-describedby="alert-dialog-description"
-          >
-            <DialogTitle id="alert-dialog-title">{"Use Google's location service?"}</DialogTitle>
+          <Dialog open={open} onClose={() => setOpen(!open)} maxWidth='lg'>
+            <DialogTitle>{(context === 'add') ? 'Adicionar novo item' : 'Editar item'}</DialogTitle>
             <DialogContent>
-              <h1>Form</h1>
+              <form noValidate autoComplete="off">
+                <h2>Postagem</h2>
+                <Divider className={styles.divider}/>
+                <TextField id="outlined-basic" label="Título" variant="outlined" className={styles.textField}/>
+                <TextField id="outlined-basic" label="Conteúdo" variant="outlined" multiline rows={6} className={styles.textField}/>
+
+                <h2>Comentários</h2>
+                <Divider className={styles.divider}/>
+                <TextField id="outlined-basic" label="Nome" variant="outlined" className={styles.textField}/>
+                <TextField id="outlined-basic" label="E-mail" variant="outlined" className={styles.textField}/>
+                <TextField id="outlined-basic" label="Comentário" variant="outlined" className={styles.textField}/>
+              </form>
+
+              <Button variant="contained" onClick={() => setOpen(!open)} color="primary">
+                Adicionar Comentário
+              </Button>
+
+              <TableContainer component={Paper}>
+                <Table  size="small" aria-label="a dense table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="left">Nome</TableCell>
+                      <TableCell align="left">E-mail</TableCell>
+                      <TableCell align="left">Conteúdo</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {commentArray.map((comment) => (
+                        <TableRow key={comment.id}>
+                          <TableCell align="left">{comment.name}</TableCell>
+                          <TableCell align="left">{comment.email}</TableCell>
+                          <TableCell align="left">{comment.body}</TableCell>
+                        </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
             </DialogContent>
             <DialogActions>
               <Button variant="contained" onClick={() => setOpen(!open)} color="primary">
